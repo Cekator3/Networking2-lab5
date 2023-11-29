@@ -4,6 +4,7 @@
 
 import {currencyConvertionGetName} from "~/Model/Currency/Convertion/getName";
 import {currencyGetAllCodes} from "~/Model/Currency/getAllCodes";
+import {Http} from "@nativescript/core";
 
 const CONVERTION_BASE = 'eur';     //euro
 const convertionMultipliers = new Map();
@@ -14,16 +15,34 @@ function setConvertion(from, to, multiplier)
     convertionMultipliers.set(currencyConvertionGetName(from, to), multiplier);
 }
 
+function setNewConvertationMultipliers(newMultipliers)
+{
+    let currencyCodes = currencyGetAllCodes();
+    for (let i = 0; i < currencyCodes.length; i++)
+    {
+        for (let j = i; j < currencyCodes.length; j++)
+        {
+            let from = currencyCodes[i]
+            let to = currencyCodes[j];
+            let multiplier = newMultipliers[to] / newMultipliers[from];
+            setConvertion(from, to, multiplier);
+            setConvertion(to, from, 1 / multiplier);
+        }
+    }
+}
+
 async function fetchConvertionMultipliersFromApi()
 {
-    let response = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${CONVERTION_BASE}.json`);
-    if (!response.ok)
+    let multipliersJson;
+    try
     {
-        if (response.status === 404)
-            return 2;
+        multipliersJson = await Http.getJSON(`https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${CONVERTION_BASE}.json`);
+    }
+    catch (e)
+    {
         return 1;
     }
-    return await response.json();
+    return multipliersJson;
 }
 
 function isMultipliersUpToDate(jsonDate)
@@ -32,27 +51,13 @@ function isMultipliersUpToDate(jsonDate)
            (multipliersLastUpdateDate.getTime() === jsonDate.getTime());
 }
 
-function setNewConvertationMultipliers(newMultipliers)
-{
-    let currencyCodes = currencyGetAllCodes();
-    for (let code of currencyCodes)
-    {
-        let multiplier = newMultipliers[code];
-        setConvertion(CONVERTION_BASE, code, multiplier);
-        setConvertion(code, CONVERTION_BASE, 1 / multiplier);
-    }
-}
-
 /**
  * Updates the currency convertion multipliers.
  *
- * @return {number} Returns completion status code.
+ * @return {Promise<number>} Returns completion status code.
  *
  * 0 - Success
- *
- * 2 - Internet connection error
- *
- * 1 - Other errors
+ * 1 - Network request error
  */
 export async function currencyConvertionUpdateMultipliers()
 {
@@ -64,7 +69,6 @@ export async function currencyConvertionUpdateMultipliers()
         return 0;
     multipliersLastUpdateDate = jsonDate;
     setNewConvertationMultipliers(json[CONVERTION_BASE]);
-    console.log(...convertionMultipliers);
     return 0;
 }
 

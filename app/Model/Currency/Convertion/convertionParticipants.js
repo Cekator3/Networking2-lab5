@@ -15,7 +15,7 @@ let targetCurrency = 'usd';
  * Returns false if currency doesn't exist.
  * Returns true otherwise.
  */
-export function CurrencyConvertionParticipantsSetBaseCurrency(currencyCode)
+export function currencyConvertionParticipantsSetBaseCurrency(currencyCode)
 {
     if (!currencyExists(currencyCode))
         return false;
@@ -30,7 +30,7 @@ export function CurrencyConvertionParticipantsSetBaseCurrency(currencyCode)
  * Returns false if currency doesn't exist.
  * Returns true otherwise.
  */
-export function CurrencyConvertionParticipantsSetTargetCurrency(currencyCode)
+export function currencyConvertionParticipantsSetTargetCurrency(currencyCode)
 {
     if (!currencyExists(currencyCode))
         return false;
@@ -42,7 +42,7 @@ export function CurrencyConvertionParticipantsSetTargetCurrency(currencyCode)
  * Returns target currency of the current convertion.
  * @return {string}
  */
-export function CurrencyConvertionParticipantsGetTargetCurrency()
+export function currencyConvertionParticipantsGetTargetCurrency()
 {
     return targetCurrency;
 }
@@ -51,7 +51,7 @@ export function CurrencyConvertionParticipantsGetTargetCurrency()
  * Returns base currency of the current convertion.
  * @return {string}
  */
-export function CurrencyConvertionParticipantsGetBaseCurrency()
+export function currencyConvertionParticipantsGetBaseCurrency()
 {
     return baseCurrency;
 }
